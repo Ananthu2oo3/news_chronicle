@@ -1,0 +1,2 @@
+selenium==3.141.0
+chromedriver-auto==114.0.5735.90
