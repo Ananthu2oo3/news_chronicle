@@ -8,7 +8,7 @@ header = ['title', 'link']
 
 def write_csv():
 
-    with open('link.csv', mode='w', newline='') as f:
+    with open('link.csv', mode='a', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=header)
         writer.writeheader()
         writer.writerows(data)
@@ -35,7 +35,7 @@ def startpy():
                 for j in range(1, 11):
                     try:
                         xp = xpath.format(i)
-                        link = driver.find_element(By.XPATH, f'//*[@id="block-mainpagecontent"]/div/ol/li[{j}]/h3/a')
+                        link = driver.find_element(By.XPATH, xp)
                         url = link.get_attribute("href")
                         title = link.text
 
