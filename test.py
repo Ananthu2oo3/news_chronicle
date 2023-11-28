@@ -12,20 +12,19 @@ def write_csv():
         writer.writeheader()
         writer.writerows(data)
 
-def startpy():
-    prompt = input("Prompt: ")
-    key = prompt.replace(" ", "%20")
+def scrape(url,xpath):
+    
     driver = webdriver.Chrome()
-
-    processed_urls = set()  
-
+    processed_urls = set()
     for i in range(1, 21):
+        
         try:
-            driver.get(f"https://constructafrica.com/search/node?keys={key}&page={i}%2C0%2C0")
+            driver.get(url)
 
             for j in range(1, 11):
                 try:
-                    link = driver.find_element(By.XPATH, f'//*[@id="block-mainpagecontent"]/div/ol/li[{j}]/h3/a')
+                    xp = xpath.format(i)
+                    link = driver.find_element(By.XPATH, xp)
                     url = link.get_attribute("href")
                     title = link.text
 
@@ -46,7 +45,24 @@ def startpy():
 
     driver.quit() 
 
+
+def startpy():
+    prompt = input("Prompt: ")
+    key = prompt.replace(" ", "%20")
+    
+    with open('source.csv', 'r') as csv_file:
+        
+        csv_reader = csv.DictReader(csv_file)
+
+        for row in csv_reader:
+            
+            xpath       = row['xpath']
+            url    = row['base_url']
+            
+            scrape(url,xpath)
+              
+
     
 if __name__ == '__main__':
     startpy()
-    write_csv()
+
