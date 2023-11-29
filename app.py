@@ -14,7 +14,7 @@ def write_csv():
         writer.writeheader()
         writer.writerows(data)
 
-def startpy():
+def scrape():
     prompt  = input("Prompt: ")
     key     = prompt.replace(" ", "%20")
     driver  = webdriver.Chrome()
@@ -59,5 +59,5 @@ def startpy():
 
     
 if __name__ == '__main__':
-    startpy()
+    scrape()
     write_csv()
