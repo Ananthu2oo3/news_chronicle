@@ -16,6 +16,9 @@ Title:
     //*[@id="block-mainpagecontent"]/div/ol/li[1]/h3/a
     //*[@id="block-mainpagecontent"]/div/ol/li[2]/h3/a
 
+    //*[@id="block-mainpagecontent"]/div/article/div/div/div[2]/div[2]
+    //*[@id="block-mainpagecontent"]/div/article/div/div/div[2]/div[2]
+
 
 Date:
 

@@ -1,18 +1,77 @@
+import re
 import csv
 import pandas as pd
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 
-data = []
-header = ['title', 'link']
+data    = []
+header  = ['title', 'link', 'date']
+
+def sort_csv_by_date(csv_file_path):
+    with open(csv_file_path, 'r') as file:
+        reader = csv.DictReader(file)
+        data = list(reader)
+
+    # Sort the data based on the 'date' field
+    data.sort(key=lambda x: datetime.strptime(x['date'], '%d/%m/%Y'), reverse=True)
+
+    # Write the sorted data back to the CSV file
+    with open(csv_file_path, 'w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=['title', 'link', 'date'])
+        writer.writeheader()
+        writer.writerows(data)
+
+
+def convert(date_str):
+    if isinstance(date_str, (int, float)):
+        date_pattern = r'\b\d{2}/\d{2}/\d{4}\b'
+        dates = re.findall(date_pattern, str(date_str))
+
+        # Assuming that there can be multiple matches, convert each one
+        converted_dates = [datetime.strptime(date, "%m/%d/%Y").strftime("%d/%m/%Y") for date in dates]
+        return converted_dates
+
+    # Try to extract the date part using a specific pattern
+    date_match = re.search(r'(\d{2}/\d{2}/\d{4})', date_str)
+    if date_match:
+        date_str = date_match.group(1)
+
+        # Try to parse the date with the specific format
+        try:
+            date_obj = datetime.strptime(date_str, "%m/%d/%Y")
+            return date_obj.strftime("%d/%m/%Y")
+        except ValueError:
+            pass
+    
+    # Try to parse the date with multiple formats
+    formats_to_try = ["%B %d, %Y", "%m/%d/%Y - %H:%M", "%A, %B %d, %Y - %H:%M", "%B %d, %Y - %H:%M"]
+    for format_str in formats_to_try:
+        try:
+            date_obj = datetime.strptime(date_str, format_str)
+            return date_obj.strftime("%d/%m/%Y")
+        except ValueError:
+            pass
+    # If none of the formats match, return the original string
+    return date_str
 
 def write_csv():
 
-    with open('link.csv', mode='a', newline='') as f:
+    for row in data:
+        row['date'] = convert(row['date'])
+
+    # sorted_data = data.sort(key=lambda x: datetime.strptime(x['date'], '%d/%m/%Y'), reverse=True)
+    # sorted_data = sorted(data, key=lambda x: datetime.strptime(x['date'], '%d/%m/%Y'))
+    # sorted_data = data.sort(key=lambda x: datetime.strptime(x['date'], '%d/%m/%Y'))
+    # sorted_data = sorted(data, key=lambda x: x['date'])
+
+    
+    with open('link.csv', mode='w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=header)
         writer.writeheader()
         writer.writerows(data)
+
 
 def scrape():
     prompt  = input("Prompt: ")
@@ -26,8 +85,9 @@ def scrape():
     
     for i in range(rows):
         base_url = source.base_url[i]
-        xpath    = source.xpath[i]
-   
+        xpath    = source.title[i]
+        basedate = source.date[i]
+
         for i in range(1,5):
             try:
                 url = f"{base_url.format(key= key, page=i)}"
@@ -35,16 +95,22 @@ def scrape():
 
                 for j in range(1, 11):
                     try:
-                        xp = xpath.format(j)
-                        link = driver.find_element(By.XPATH, xp)
-                        url = link.get_attribute("href")
-                        title = link.text
+                        xp      = xpath.format(j)
+                        date_xp = basedate.format(j)
+
+                        date    = driver.find_element(By.XPATH, date_xp).text
+                        link    = driver.find_element(By.XPATH, xp)
+                        url     = link.get_attribute("href")
+                        title   = link.text
 
                         if url not in processed_urls:
+
                             entry = {
-                                "title": title,
-                                "link": url
+                                "title" : title,
+                                "link"  : url,
+                                "date"  : date
                             }
+                            
                             data.append(entry)
                             processed_urls.add(url)
 
@@ -61,3 +127,4 @@ def scrape():
 if __name__ == '__main__':
     scrape()
     write_csv()
+    sort_csv_by_date('link.csv')

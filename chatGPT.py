@@ -11,7 +11,6 @@ def get_website_content(url):
         response = requests.get(url)
         response.raise_for_status()
         return response.text
-    
     except requests.exceptions.RequestException as err:
         print(f"Error fetching content: {err}")
         return None
@@ -47,33 +46,24 @@ def get_chatgpt_summary(prompt):
 def main():
     # Example URL
     # url = "https://constructafrica.com/projects-and-tenders/drc-invites-bids-build-primary-schools"
-    data = pd.read_csv('link.csv')
-    summaries = []
+    data = pd.
+    # Fetch content from the website
+    html_content = get_website_content(url)
 
-    for i in range(0,3):
+    if html_content:
+        # Extract text content from HTML
+        text_content = extract_text_from_html(html_content)
 
-        url = data.link[i]
-        # Fetch content from the website
-        html_content = get_website_content(url)
+        # Truncate content to fit within the model's maximum context length
+        truncated_content = truncate_text(text_content, 500)
 
-        if html_content:
-            # Extract text content from HTML
-            text_content = extract_text_from_html(html_content)
+        # Get a summary from ChatGPT
+        summary = get_chatgpt_summary(truncated_content)
 
-            # Truncate content to fit within the model's maximum context length
-            truncated_content = truncate_text(text_content, 500)
-
-            # Get a summary from ChatGPT
-            summary = get_chatgpt_summary(truncated_content)
-
-            # Print the results
-            # print(f"Original URL: {url}")
-            # print("\nChatGPT Summary:")
-            # print(summary)
-
-            summaries.append(summary)
-
-    data['Summary'] = summaries
+        # Print the results
+        print(f"Original URL: {url}")
+        print("\nChatGPT Summary:")
+        print(summary)
 
 if __name__ == "__main__":
     main()
