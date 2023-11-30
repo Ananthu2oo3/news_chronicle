@@ -2,6 +2,7 @@ import openai
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import time
 
 # Set your OpenAI API key
 openai.api_key = "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"
@@ -44,15 +45,49 @@ def get_chatgpt_summary(prompt):
     summary = response["choices"][0]["text"].strip()
     return summary
 
+# def main():
+#     # Example URL
+#     # url = "https://constructafrica.com/projects-and-tenders/drc-invites-bids-build-primary-schools"
+#     data = pd.read_csv('link.csv')
+#     summaries = []
+
+#     for i in range(0,2):
+
+#         url = data.link[i]
+#         # Fetch content from the website
+#         html_content = get_website_content(url)
+
+#         if html_content:
+#             # Extract text content from HTML
+#             text_content = extract_text_from_html(html_content)
+
+#             # Truncate content to fit within the model's maximum context length
+#             truncated_content = truncate_text(text_content, 500)
+
+#             # Get a summary from ChatGPT
+#             summary = get_chatgpt_summary(truncated_content)
+
+#             # Print the results
+#             # print(f"Original URL: {url}")
+#             print("\nChatGPT Summary:")
+#             print(summary,"\n\n")
+
+#             summaries.append(summary)
+
+#     data['Summary'] = summaries
+
 def main():
-    # Example URL
-    # url = "https://constructafrica.com/projects-and-tenders/drc-invites-bids-build-primary-schools"
+    # Read links from the input CSV file
     data = pd.read_csv('link.csv')
-    summaries = []
 
-    for i in range(0,3):
+    # Process only the top 10 links
+    top_10_data = data.head(3)
 
-        url = data.link[i]
+    summaries = []  # List to store summaries
+
+    for i, row in top_10_data.iterrows():
+        url = row['link']
+
         # Fetch content from the website
         html_content = get_website_content(url)
 
@@ -66,14 +101,21 @@ def main():
             # Get a summary from ChatGPT
             summary = get_chatgpt_summary(truncated_content)
 
-            # Print the results
-            # print(f"Original URL: {url}")
-            # print("\nChatGPT Summary:")
-            # print(summary)
-
+            # Append the summary to the list
             summaries.append(summary)
 
-    data['Summary'] = summaries
+            # Print the results
+            print(f"Original URL: {url}")
+            print("\nChatGPT Summary:")
+            print(summary)
+            time.sleep(0.1)
+
+    # Create a DataFrame with the top 10 links and summaries
+    result_data = pd.DataFrame({'URL': top_10_data['link'], 'Summary': summaries})
+
+    # Save the DataFrame with summaries to a new CSV file
+    result_data.to_csv('summaries.csv', index=False)
+
 
 if __name__ == "__main__":
     main()
