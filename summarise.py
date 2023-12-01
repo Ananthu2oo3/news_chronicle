@@ -1,16 +1,20 @@
+
 import openai
 import requests
-from bs4 import BeautifulSoup
+import os
 import pandas as pd
+import time
+from bs4 import BeautifulSoup
 
 # Set your OpenAI API key
-openai.api_key = "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"
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 def get_website_content(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
         return response.text
+    
     except requests.exceptions.RequestException as err:
         print(f"Error fetching content: {err}")
         return None
@@ -43,27 +47,49 @@ def get_chatgpt_summary(prompt):
     summary = response["choices"][0]["text"].strip()
     return summary
 
+
+def process_links_in_batches(links, batch_size):
+    summaries = []
+    for i in range(0, len(links), batch_size):
+        batch = links[i:i + batch_size]
+        batch_summaries = process_batch(batch)
+        summaries.extend(batch_summaries)
+        
+    return summaries
+
+def process_batch(links):
+
+    batch_summaries = []
+    for url in links:
+        html_content = get_website_content(url)
+        if html_content:
+            text_content = extract_text_from_html(html_content)
+            truncated_content = truncate_text(text_content, 500)
+            summary = get_chatgpt_summary(truncated_content)
+            time.sleep(15)
+            print("\n",summary)
+            batch_summaries.append({'URL': url, 'Summary': summary})
+
+    return batch_summaries
+
+
 def main():
-    # Example URL
-    # url = "https://constructafrica.com/projects-and-tenders/drc-invites-bids-build-primary-schools"
-    data = pd.
-    # Fetch content from the website
-    html_content = get_website_content(url)
 
-    if html_content:
-        # Extract text content from HTML
-        text_content = extract_text_from_html(html_content)
+    # Read links from the input CSV file
+    read = pd.read_csv('link.csv')
+    data = read.head(10)
 
-        # Truncate content to fit within the model's maximum context length
-        truncated_content = truncate_text(text_content, 500)
+    # Processdef links in batches
+    batch_size = 3
+    summaries = process_links_in_batches(data['link'], batch_size)
 
-        # Get a summary from ChatGPT
-        summary = get_chatgpt_summary(truncated_content)
+    # Create a DataFrame with the links and summaries
+    result_data = pd.DataFrame(summaries)
 
-        # Print the results
-        print(f"Original URL: {url}")
-        print("\nChatGPT Summary:")
-        print(summary)
+    # Save the DataFrame with summaries to a new CSV file
+    result_data.to_csv('summaries.csv', index=False)
+
 
 if __name__ == "__main__":
     main()
+
