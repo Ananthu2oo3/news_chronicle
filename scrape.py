@@ -24,14 +24,61 @@ def sort_csv_by_date(csv_file_path):
         writer.writerows(data)
 
 
+# def convert(date_str):
+#     if isinstance(date_str, (str,int,float)):
+#         date_pattern = r'\b\d{2}/\d{2}/\d{4}\b'
+#         dates = re.findall(date_pattern, str(date_str))
+
+#         # Assuming that there can be multiple matches, convert each one
+#         converted_dates = [datetime.strptime(date, "%m/%d/%Y").strftime("%d/%m/%Y") for date in dates]
+
+#         if len(converted_dates) == 1:
+#             return converted_dates[0]
+#         else:
+#             return converted_dates
+
+#         # return converted_dates
+
+#     # Try to extract the date part using a specific pattern
+#     date_match = re.search(r'(\d{2}/\d{2}/\d{4})', date_str)
+#     if date_match:
+#         date_str = date_match.group(1)
+
+#         # Try to parse the date with the specific format
+#         try:
+#             date_obj = datetime.strptime(date_str, "%m/%d/%Y")
+#             return date_obj.strftime("%d/%m/%Y")
+#         except ValueError:
+#             pass
+    
+#     # Try to parse the date with multiple formats
+#     formats_to_try = ["%B %d, %Y", "%m/%d/%Y - %H:%M", "%A, %B %d, %Y - %H:%M", "%B %d, %Y - %H:%M"]
+#     for format_str in formats_to_try:
+#         try:
+#             date_obj = datetime.strptime(date_str, format_str)
+#             return date_obj.strftime("%d/%m/%Y")
+#         except ValueError:
+#             pass
+#     # If none of the formats match, return the original string
+#     # return date_str
+#     return '00/00/0000'
+
 def convert(date_str):
-    if isinstance(date_str, (int, float)):
+    if isinstance(date_str, (str, int, float)):
         date_pattern = r'\b\d{2}/\d{2}/\d{4}\b'
         dates = re.findall(date_pattern, str(date_str))
 
         # Assuming that there can be multiple matches, convert each one
         converted_dates = [datetime.strptime(date, "%m/%d/%Y").strftime("%d/%m/%Y") for date in dates]
-        return converted_dates
+
+        if converted_dates:
+            # Check if there is only one date, return it directly
+            if len(converted_dates) == 1:
+                return converted_dates[0]
+            else:
+                return converted_dates
+        else:
+            return '01/01/2000'
 
     # Try to extract the date part using a specific pattern
     date_match = re.search(r'(\d{2}/\d{2}/\d{4})', date_str)
@@ -44,7 +91,7 @@ def convert(date_str):
             return date_obj.strftime("%d/%m/%Y")
         except ValueError:
             pass
-    
+
     # Try to parse the date with multiple formats
     formats_to_try = ["%B %d, %Y", "%m/%d/%Y - %H:%M", "%A, %B %d, %Y - %H:%M", "%B %d, %Y - %H:%M"]
     for format_str in formats_to_try:
@@ -53,8 +100,11 @@ def convert(date_str):
             return date_obj.strftime("%d/%m/%Y")
         except ValueError:
             pass
-    # If none of the formats match, return the original string
-    return date_str
+
+    # If none of the formats match or no valid date is found, return a placeholder date
+    return '01/01/2000'  # Adjust the placeholder date as needed
+
+
 
 def write_csv():
 
