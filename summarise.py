@@ -32,7 +32,7 @@ def truncate_text(text, max_tokens):
 
 def get_chatgpt_summary(prompt):
     # Define your prompt for ChatGPT
-    chatgpt_prompt = f"Summarize the following text:\n{prompt}"
+    chatgpt_prompt = f"Rewrite this as a crisp and short news article with no subscribe ad but news alone, also the output must be just one para:\n{prompt}"
 
     # Call the OpenAI API
     response = openai.Completion.create(

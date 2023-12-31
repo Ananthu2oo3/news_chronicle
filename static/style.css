@@ -1,0 +1,76 @@
+/* static/style.css */
+
+/* Primary Color */
+:root {
+    --primary-color: #1e1f22;
+}
+
+/* Secondary Color */
+:root {
+    --secondary-color: #28292c;
+}
+
+/* Accent Color */
+:root {
+    --accent-color: #ff7043;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--primary-color);
+    color: #fff; /* Text color on primary background, adjust as needed */
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #28292c; /* Updated background color */
+    color: #fff; /* Updated text color */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #fff;
+}
+
+form {
+    margin-top: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ff5722; /* Adjust hover color as needed */
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+.list-group-item {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    padding: 15px;
+    background-color: #fff;
+    color: var(--primary-color); /* Text color on secondary background, adjust as needed */
+}
